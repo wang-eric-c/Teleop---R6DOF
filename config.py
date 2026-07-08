@@ -9,8 +9,8 @@ ARM_X = (-0.3, 0.3)   # left / right
 ARM_Y = (0.2, 0.6)    # depth 
 ARM_Z = (0.1, 0.8)    # up / down
 
-PINCH_THRESHOLD = 0.05    # thumb tip <-> index tip: below this = gripper closed
-FIST_THRESHOLD = 0.15     # fingertip curl metric below this = fist (disengage)
+PINCH_THRESHOLD = 0.2    # thumb tip <-> index tip: below this = gripper closed
+FIST_THRESHOLD = 0.7     # fingertip curl metric below this = fist (disengage)
 
 EURO_MIN_CUTOFF = 1.0     # lower = smoother but more lag
 EURO_BETA = 0.007         # higher = less lag on fast motion
@@ -20,6 +20,10 @@ EURO_D_CUTOFF = 1.0
 URDF_PATH = "kuka_iiwa/model.urdf"
 END_EFFECTOR_LINK = 6     
 
+# --- Inverse Kinematics ---
+IK_MAX_ITERS = 20
+IK_TOLERANCE = 1e-3     
+IK_STEP = 0.5          
 
 """
 Everything hardware related is abstract since I haven't finished designing my Robotic Arm yet, but stay tuned!

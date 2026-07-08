@@ -16,20 +16,28 @@ def hand_to_pose(landmarks):
     z = _lerp(1 - wrist.y, 0, 1, *config.ARM_Z)
 
     size = np.hypot(wrist.x - knuckle.x, wrist.y - knuckle.y)
-    y = _lerp(size, 0.06, 0.20, config.ARM_Y[1], config.ARM_Y[0])
+    y = _lerp(size, 0.06, 0.20, *config.ARM_Y)
 
     return np.array([x, y, z])
 
 def detect_pinch(landmarks):
+    wrist = landmarks[0]
+    knuckle = landmarks[9]
+    scale = np.hypot(wrist.x - knuckle.x, wrist.y - knuckle.y)
+    
     thumb = landmarks[4]
     index = landmarks[8]
 
     dist = np.hypot(thumb.x - index.x, thumb.y - index.y)
-    return dist < config.PINCH_THRESHOLD
+    norm = dist/(scale + 1e-9)
+
+    return norm < config.PINCH_THRESHOLD
 
 
 def is_engaged(landmarks):
     wrist = landmarks[0]
+    knuckle = landmarks[9]
+    scale = np.hypot(wrist.x - knuckle.x, wrist.y - knuckle.y)
 
     index = landmarks[8]
     middle = landmarks[12]
@@ -41,6 +49,6 @@ def is_engaged(landmarks):
     r_dist = np.hypot(wrist.x - ring.x, wrist.y - ring.y)
     p_dist = np.hypot(wrist.x - pinky.x, wrist.y - pinky.y)
 
-    avg = (i_dist + m_dist + r_dist + p_dist)/4
+    avg = (i_dist + m_dist + r_dist + p_dist)/(4 * scale + 1e-9)
 
     return avg > config.FIST_THRESHOLD

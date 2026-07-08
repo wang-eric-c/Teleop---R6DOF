@@ -4,6 +4,7 @@ import pybullet_data
 
 import config
 from arm_backend import ArmBackend
+from inverse_kinematics import IKSolver
 
 
 class SimBackend(ArmBackend):
@@ -22,8 +23,11 @@ class SimBackend(ArmBackend):
             if p.getJointInfo(self._arm, j)[2] != p.JOINT_FIXED
         ]
 
+        self._ik = IKSolver(config.URDF_PATH, self._joints, self._ee)
+
     def move_to_pose(self, target_xyz):
-        joint_angles = p.calculateInverseKinematics(self._arm, self._ee, target_xyz)
+        current = [p.getJointState(self._arm, j)[0] for j in self._joints]
+        joint_angles = self._ik.solve(current, target_xyz)
         for i, j in enumerate(self._joints):
             p.setJointMotorControl2(self._arm, j, p.POSITION_CONTROL,
                                     targetPosition=joint_angles[i])
@@ -36,4 +40,5 @@ class SimBackend(ArmBackend):
         p.stepSimulation()
 
     def close(self):
+        self._ik.close()
         p.disconnect(self._cid)
